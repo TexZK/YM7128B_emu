@@ -37,7 +37,7 @@ The library provides chip emulation with three engines:
     that of an actual chip. Algorithms are fast to compute, but resampling
     still has a significant impact on performance.
 
-- **Ideal**: it represents an ideal implementation of the algorothms. Arithmetics
+- **Ideal**: it represents an ideal implementation of the algorithms. Arithmetics
     are in floating point, there are no saturations, and no sample rate
     conversions, not even at the output stage. Algorithms are fast, despite
     the loss in accuracy with respect to an actual chip.
@@ -66,26 +66,26 @@ _______________________________________________________________________________
 
 ## Usage
 
-To use this library, just include `YM7128B.c` and `YM7128B.h` into your
-project.
+To use this library, just include `YM7128B_emu.c` and `YM7128B_emu.h`
+into your project.
 
 All the engines implement the same conceptual flow:
 
-1. Status memory allocation
-2. Call *Ctor()* method to invalidate internal data
-3. Call *Reset()* method to clear emulated registers
+1. Status memory allocation.
+2. Call *Ctor()* method to invalidate internal data.
+3. Call *Reset()* method to clear emulated registers.
 4. Call *SetSampleRate()* to allocate internal delay memory
-   (only for *Ideal* engine)
-5. Call *Start()* to start the algorithms
+   (only for *Ideal* engine).
+5. Call *Start()* to start the algorithms.
 6. Processing loop:
-    1. Filter input samples
-    2. Resample input samples
+    1. Filter input samples.
+    2. Resample input samples.
     3. For each sample:
-       1. Call *Process()* method, with appropriate data types
-    4. Resample output samples
-    5. Filter output samples
-7. Call *Stop()* method to stop the algorithms
-8. Call *Dtor()* method to deallocate and invalidate internal data
+       1. Call *Process()* method, with appropriate data types.
+    4. Resample output samples.
+    5. Filter output samples.
+7. Call *Stop()* method to stop the algorithms.
+8. Call *Dtor()* method to deallocate and invalidate internal data.
 9. Status memory deallocation.
 
 Register access timings are not emulated.

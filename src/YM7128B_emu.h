@@ -26,8 +26,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _YM7128B_H_
-#define _YM7128B_H_
+#ifndef _YM7128B_EMU_H_
+#define _YM7128B_EMU_H_
 
 #include <limits.h>
 #include <stdbool.h>
@@ -558,4 +558,4 @@ void YM7128B_ChipIdeal_SetSampleRate(YM7128B_ChipIdeal* self,
 }  // extern "C"
 #endif
 
-#endif  // !_OPLY_YM7128B_HPP_
+#endif  // !_YM7128B_EMU_H_

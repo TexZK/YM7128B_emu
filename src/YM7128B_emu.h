@@ -202,6 +202,13 @@ enum YM7128B_ImplementationSpecs {
     YM7128B_Coeff_Decimals      = YM7128B_Coeff_Bits - 1
 };
 
+typedef enum YM7128B_ChipMode {
+    YM7128B_ChipMode_Fixed = 0,
+    YM7128B_ChipMode_Float,
+    YM7128B_ChipMode_Ideal,
+    YM7128B_ChipMode_Count
+} YM7128B_ChipMode;
+
 // ----------------------------------------------------------------------------
 
 extern signed short const YM7128B_GainDecibel_Table[YM7128B_Gain_Data_Count / 2];
@@ -225,7 +232,7 @@ YM7128B_INLINE
 YM7128B_TapIdeal YM7128B_RegisterToTapIdeal(YM7128B_Register data, YM7128B_TapIdeal sample_rate)
 {
     YM7128B_Register i = data & YM7128B_Tap_Value_Mask;
-    YM7128B_TapIdeal t = (YM7128B_TapIdeal)((data * (sample_rate / 10)) / (YM7128B_Tap_Value_Count - 1));
+    YM7128B_TapIdeal t = (YM7128B_TapIdeal)((i * (sample_rate / 10)) / (YM7128B_Tap_Value_Count - 1));
     return t;
 }
 

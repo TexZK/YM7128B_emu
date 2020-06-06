@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{51C2069A-A8B0-46D8-9F18-6EA0DB66E00B}") = "YM7128B_pipe", "YM7128B_pipe\YM7128B_pipe.vcxproj", "{863C60A0-57E6-414D-BB90-FAFB2C115ED5}"
+EndProject
+Project("{51C2069A-A8B0-46D8-9F18-6EA0DB66E00B}") = "YM7128B_emu", "YM7128B_emu\YM7128B_emu.vcxitems", "{42B23AE4-CF91-4AF2-9722-1DC9B82E5507}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		YM7128B_emu\YM7128B_emu.vcxitems*{42B23AE4-CF91-4AF2-9722-1DC9B82E5507}*SharedItemsImports = 9
+		YM7128B_emu\YM7128B_emu.vcxitems*{863C60A0-57E6-414D-BB90-FAFB2C115ED5}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Debug|x64.ActiveCfg = Debug|x64
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Debug|x64.Build.0 = Debug|x64
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Debug|x86.ActiveCfg = Debug|Win32
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Debug|x86.Build.0 = Debug|Win32
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Release|x64.ActiveCfg = Release|x64
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Release|x64.Build.0 = Release|x64
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Release|x86.ActiveCfg = Release|Win32
+		{863C60A0-57E6-414D-BB90-FAFB2C115ED5}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F4AFD85E-C827-4D83-930E-2FDB1B484773}
+	EndGlobalSection
+EndGlobal

@@ -76,7 +76,7 @@ OPTION (evaluated as per command line argument order):\n\
     See ENGINE table.\n\
 \n\
 -r, --rate RATE\n\
-    Sample rate [Hz]; default: 23549.\n\
+    Sample rate [Hz]; default: 23550.\n\
 \n\
 --preset PRESET\n\
     Register preset; default: off. See PRESET table.\n\

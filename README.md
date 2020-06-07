@@ -48,13 +48,13 @@ In the following table, an overview of the features of each engine:
 |-----------------------|-----------------------------|-----------------------------|-------------------------|
 | Input filter          | suggested: 6th order 15 kHz | suggested: 6th order 15 kHz | not required            |
 | Input signal          | Q1.13                       | double, normalized          | double                  |
-| Input rate            | 23549 Hz                    | 23549 Hz                    | suggested: above 40 kHz |
+| Input rate            | 23550 Hz                    | 23550 Hz                    | suggested: above 40 kHz |
 | Saturated arithmetics | yes                         | yes, normalized             | no                      |
 | Signal operand        | Q1.15                       | double                      | double                  |
 | Gain operand          | Q1.11                       | double                      | double                  |
 | Feedback operand      | Q1.5                        | double                      | double                  |
 | Oversampler operand   | Q1.11                       | double                      | no oversampling         |
-| Output rate           | 47098 Hz                    | 47098 Hz                    | same as input           |
+| Output rate           | 47100 Hz                    | 47100 Hz                    | same as input           |
 | Output signal         | Q1.13                       | double, normalized          | double                  |
 | Output filter         | suggested: 3rd order 15 kHz | suggested: 3rd order 15 kHz | not required            |
 | Status memory         | allocated by the user       | allocated by the user       | allocated by the user   |

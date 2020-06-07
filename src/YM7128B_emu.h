@@ -121,7 +121,7 @@ enum YM7128B_DatasheetSpecs {
     YM7128B_Write_Rate        = (YM7128B_Clock_Rate / 8) / (8 + 1 + 8 + 1),
 
     //! Input sample rate [Hz]
-    YM7128B_Input_Rate        = YM7128B_Clock_Rate / 304,
+    YM7128B_Input_Rate        = (YM7128B_Clock_Rate + (304 / 2)) / 304,
 
     //! Output oversampling factor
     YM7128B_Oversampling      = 2,

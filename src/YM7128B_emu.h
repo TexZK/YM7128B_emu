@@ -202,12 +202,12 @@ enum YM7128B_ImplementationSpecs {
     YM7128B_Coeff_Decimals      = YM7128B_Coeff_Bits - 1
 };
 
-typedef enum YM7128B_ChipMode {
-    YM7128B_ChipMode_Fixed = 0,
-    YM7128B_ChipMode_Float,
-    YM7128B_ChipMode_Ideal,
-    YM7128B_ChipMode_Count
-} YM7128B_ChipMode;
+typedef enum YM7128B_ChipEngine {
+    YM7128B_ChipEngine_Fixed = 0,
+    YM7128B_ChipEngine_Float,
+    YM7128B_ChipEngine_Ideal,
+    YM7128B_ChipEngine_Count
+} YM7128B_ChipEngine;
 
 // ----------------------------------------------------------------------------
 

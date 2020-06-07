@@ -47,7 +47,8 @@ It reads a sample stream from standard input, processes data, and writes\n\
 to the standard output.\n\
 The sample format is as specified by the --format option.\n\
 The output is always stereo, with the same sample format as per the input.\n\
-In case of fixed and float modes, the output rate is doubled (oversampled).\n\
+In case of fixed and float engines, the output rate is doubled\n\
+(2x oversampling).\n\
 \n\
 \n\
 USAGE:\n\
@@ -56,21 +57,37 @@ USAGE:\n\
 \n\
 OPTION (evaluated as per command line argument order):\n\
 \n\
+--dry DECIBEL\n\
+    Dry (unprocessed) output volume multiplier [dB]; default: 0.\n\
+    Values outside range (-128; +128) do mute.\n\
+\n\
 -f, --format FORMAT\n\
     Sample format name; default: U8.\n\
     See FORMAT table.\n\
 \n\
--m, --mode MODE\n\
-    Chip mode; default: fixed.\n\
+-h, --help\n\
+    Prints this help message and quits.\n\
+\n\
+-m, --engine MODE\n\
+    Chip engine; default: fixed.\n\
     See MODE table.\n\
 \n\
 -r, --rate RATE\n\
-    Sample rate [Hz]; default: 44100.\n\
+    Sample rate [Hz]; default: 23549.\n\
 \n\
--h, --help\n\
-    Prints this help message and quits.\n\
+--preset PRESET\n\
+    Register preset; default: off. See PRESET table.\n\
+\n\
 --reg-<REGISTER> [0x]HEX\n\
     Value of <REGISTER> register; hexadecimal string.\n\
+\n\
+--regdump HEX...\n\
+    Hexadecimal string of all the registers to overwrite, starting from\n\
+    address zero.\n\
+\n\
+--wet DECIBEL\n\
+    Wet (processed) output volume multiplier [dB]; default: 0.\n\
+    Values outside range (-128; +128) do mute.\n\
 \n\
 \n\
 FORMAT:\n\
@@ -97,7 +114,22 @@ MODE:\n\
 \n\
 - fixed:  Fixed-point (default).\n\
 - float:  Floating-point.\n\
-- ideal:  Ideal model.\n\
+- ideal:  Ideal enginel.\n\
+\n\
+\n\
+PRESET:\n\
+\n\
+- off\n\
+- direct\n\
+- dune/arrakis\n\
+- dune/baghdad\n\
+- dune/morning\n\
+- dune/sequence\n\
+- dune/sietch\n\
+- dune/warsong\n\
+- dune/water\n\
+- dune/wormintro\n\
+- dune/wormsuit\n\
 \n\
 \n\
 LICENSE:\n\
@@ -456,13 +488,13 @@ struct FormatTable {
 
 struct ChipModeTable {
     char const* label;
-    YM7128B_ChipMode value;
+    YM7128B_ChipEngine value;
 } const MODE_TABLE[] =
 {
-    { "fixed", YM7128B_ChipMode_Fixed },
-    { "float", YM7128B_ChipMode_Float },
-    { "ideal", YM7128B_ChipMode_Ideal },
-    { NULL,    YM7128B_ChipMode_Count }
+    { "fixed", YM7128B_ChipEngine_Fixed },
+    { "float", YM7128B_ChipEngine_Float },
+    { "ideal", YM7128B_ChipEngine_Ideal },
+    { NULL,    YM7128B_ChipEngine_Count }
 };
 
 
@@ -511,18 +543,131 @@ struct RegisterTable {
 };
 
 
+struct PresetTable {
+    char const* label;
+    YM7128B_Register regs[YM7128B_Reg_Count];
+} const PRESET_TABLE[] =
+{
+    { "off", {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    }},
+    { "direct", {
+        0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x3F, 0x00, 0x3F, 0x3F,
+        0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    }},
+    { "dune/arrakis", {
+        0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07, 0x00,
+        0x00, 0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07,
+        0x1A, 0x1D, 0x1A, 0x1A,
+        0x16, 0x16,
+        0x1F, 0x03, 0x07, 0x0B, 0x0F, 0x13, 0x17, 0x1B, 0x1F,
+    }},
+    { "dune/baghdad", {
+        0x1F, 0x00, 0x1B, 0x00, 0x17, 0x00, 0x33, 0x00,
+        0x00, 0x1D, 0x00, 0x19, 0x00, 0x15, 0x00, 0x11,
+        0x1D, 0x1D, 0x1D, 0x1D,
+        0x13, 0x13,
+        0x06, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10,
+    }},
+    { "dune/morning", {
+        0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07, 0x00,
+        0x00, 0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07,
+        0x1A, 0x1D, 0x1B, 0x1B,
+        0x16, 0x16,
+        0x1F, 0x03, 0x07, 0x0B, 0x0F, 0x13, 0x17, 0x1B, 0x1F,
+    }},
+    { "dune/sequence", {
+        0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07, 0x00,
+        0x00, 0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07,
+        0x1A, 0x1D, 0x1C, 0x1C,
+        0x16, 0x16,
+        0x1F, 0x03, 0x07, 0x0B, 0x0F, 0x13, 0x17, 0x1B, 0x1F,
+    }},
+    { "dune/sietch", {
+        0x1F, 0x00, 0x1B, 0x00, 0x17, 0x00, 0x33, 0x00,
+        0x00, 0x1D, 0x00, 0x19, 0x00, 0x15, 0x00, 0x11,
+        0x1D, 0x1D, 0x1D, 0x1D,
+        0x13, 0x13,
+        0x06, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10,
+    }},
+    { "dune/warsong", {
+        0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07, 0x00,
+        0x00, 0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07,
+        0x1A, 0x1D, 0x1C, 0x1C,
+        0x16, 0x16,
+        0x1F, 0x03, 0x07, 0x0B, 0x0F, 0x13, 0x17, 0x1B, 0x1F,
+    }},
+    { "dune/water", {
+        0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07, 0x00,
+        0x00, 0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07,
+        0x1A, 0x1D, 0x1A, 0x1A,
+        0x16, 0x16,
+        0x1F, 0x03, 0x07, 0x0B, 0x0F, 0x13, 0x17, 0x1B, 0x1F,
+    }},
+    { "dune/wormintro", {
+        0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07, 0x00,
+        0x00, 0x1F, 0x00, 0x17, 0x00, 0x0F, 0x00, 0x07,
+        0x1A, 0x1D, 0x18, 0x18,
+        0x16, 0x16,
+        0x1F, 0x03, 0x07, 0x0B, 0x0F, 0x13, 0x17, 0x1B, 0x1F,
+    }},
+    { "dune/wormsuit", {
+        0x18, 0x00, 0x1A, 0x00, 0x1C, 0x00, 0x1E, 0x00,
+        0x00, 0x19, 0x00, 0x1B, 0x00, 0x1D, 0x00, 0x1F,
+        0x1B, 0x1F, 0x17, 0x17,
+        0x12, 0x08,
+        0x1F, 0x07, 0x0A, 0x0D, 0x10, 0x13, 0x16, 0x19, 0x1C,
+    }},
+    { NULL, {0} }
+};
+
+
 typedef struct Args {
     STREAM_READER stream_reader;
     STREAM_WRITER stream_writer;
+    YM7128B_Float dry;
+    YM7128B_Float wet;
     YM7128B_TapIdeal rate;
-    YM7128B_ChipMode chip_mode;
+    YM7128B_ChipEngine chip_engine;
     YM7128B_Reg regs[YM7128B_Reg_Count];
 } Args;
 
 
+static uint8_t HexToByte(char const* str);
 static int RunFixed(Args const* args);
 static int RunFloat(Args const* args);
 static int RunIdeal(Args const* args);
+
+
+static uint8_t HexToByte(char const* str)
+{
+    uint8_t value = 0;
+    for (int i = 0; i < 2; ++i) {
+        char c = str[i];
+        if (c >= '0' && c <= '9') {
+            value |= (uint8_t)(c - '0');
+        }
+        else if (c >= 'a' && c <= 'f') {
+            value |= (uint8_t)((c - 'a') + 10);
+        }
+        else if (c >= 'A' && c <= 'F') {
+            value |= (uint8_t)((c - 'A') + 10);
+        }
+        else {
+            errno = ERANGE;
+            return 0;
+        }
+        value <<= 4;
+    }
+    return value;
+}
 
 
 int main(int argc, char const* argv[])
@@ -530,8 +675,10 @@ int main(int argc, char const* argv[])
     Args args;
     args.stream_reader = ReadU8;
     args.stream_writer = WriteU8;
+    args.dry = 1;
+    args.wet = 1;
     args.rate = (YM7128B_TapIdeal)YM7128B_Input_Rate;
-    args.chip_mode = YM7128B_ChipMode_Fixed;
+    args.chip_engine = YM7128B_ChipEngine_Fixed;
     for (YM7128B_Address r = 0; r < (YM7128B_Address)YM7128B_Reg_Count; ++r) {
         args.regs[r] = 0;
     }
@@ -548,6 +695,19 @@ int main(int argc, char const* argv[])
         if (i >= argc - 1) {
             fprintf(stderr, "Expecting binary argument: %s", argv[i]);
             return 1;
+        }
+        else if (!strcmp(argv[i], "--dry")) {
+            long db = strtol(argv[++i], NULL, 10);
+            if (errno) {
+                fprintf(stderr, "Invalid decibels: %s", argv[i]);
+                return 1;
+            }
+            if (db <= -128 || db >= 128) {
+                args.dry = 0;
+            }
+            else {
+                args.dry = (YM7128B_Float)pow(10, (double)db / 20);
+            }
         }
         else if (!strcmp(argv[i], "-f") ||
             !strcmp(argv[i], "--format")) {
@@ -566,18 +726,35 @@ int main(int argc, char const* argv[])
             }
         }
         else if (!strcmp(argv[i], "-m") ||
-                 !strcmp(argv[i], "--mode")) {
+                 !strcmp(argv[i], "--engine")) {
             char const* label = argv[++i];
             int j;
             for (j = 0; MODE_TABLE[j].label; ++j) {
                 if (!strcmp(label, MODE_TABLE[j].label)) {
-                    args.chip_mode = MODE_TABLE[j].value;
+                    args.chip_engine = MODE_TABLE[j].value;
                     break;
                 }
             }
             if (!MODE_TABLE[j].label) {
-                fprintf(stderr, "Unknown mode: %s", label);
+                fprintf(stderr, "Unknown engine: %s", label);
                 return 1;
+            }
+        }
+        else if (!strcmp(argv[i], "--preset")) {
+            char const* label = argv[++i];
+            int j;
+            for (j = 0; PRESET_TABLE[j].label; ++j) {
+                if (!strcmp(label, PRESET_TABLE[j].label)) {
+                    break;
+                }
+            }
+            if (!PRESET_TABLE[j].label) {
+                fprintf(stderr, "Unknown preset: %s", label);
+                return 1;
+            }
+            YM7128B_Register const* data = PRESET_TABLE[j].regs;
+            for (YM7128B_Address r = 0; r < (YM7128B_Address)YM7128B_Reg_Count; ++r) {
+                args.regs[r] = data[r];
             }
         }
         else if (!strcmp(argv[i], "-r") ||
@@ -608,6 +785,38 @@ int main(int argc, char const* argv[])
             }
             args.regs[REGISTER_TABLE[r].value] = (YM7128B_Register)value;
         }
+        else if (!strcmp(argv[i], "--regdump")) {
+            char const* strptr = argv[++i];
+            size_t length = strlen(strptr) / 2;
+            if (length > (size_t)YM7128B_Reg_Count) {
+                length = (size_t)YM7128B_Reg_Count;
+            }
+            for (size_t r = 0; r < length; ++r) {
+                uint8_t value = HexToByte(strptr);
+                strptr += 2;
+                if (errno) {
+                    fprintf(stderr, "Invalid HEX string: %s", argv[i]);
+                    return 1;
+                }
+                args.regs[r] = value;
+            }
+            for (size_t r = length; r < (size_t)YM7128B_Reg_Count; ++r) {
+                args.regs[r] = 0;
+            }
+        }
+        else if (!strcmp(argv[i], "--wet")) {
+            long db = strtol(argv[++i], NULL, 10);
+            if (errno) {
+                fprintf(stderr, "Invalid decibels: %s", argv[i]);
+                return 1;
+            }
+            if (db <= -128 || db >= 128) {
+                args.wet = 0;
+            }
+            else {
+                args.wet = (YM7128B_Float)pow(10, (double)db / 20);
+            }
+        }
         else {
             fprintf(stderr, "Unknown switch: %s", argv[i]);
             return 1;
@@ -632,15 +841,15 @@ int main(int argc, char const* argv[])
         return 1;
     }
 
-    switch (args.chip_mode)
+    switch (args.chip_engine)
     {
-    case YM7128B_ChipMode_Fixed:
+    case YM7128B_ChipEngine_Fixed:
         return RunFixed(&args);
 
-    case YM7128B_ChipMode_Float:
+    case YM7128B_ChipEngine_Float:
         return RunFloat(&args);
 
-    case YM7128B_ChipMode_Ideal:
+    case YM7128B_ChipEngine_Ideal:
         return RunIdeal(&args);
 
     default:
@@ -686,7 +895,9 @@ static int RunFixed(Args const* args)
         for (int c = 0; c < YM7128B_OutputChannel_Count; ++c) {
             for (int ovs = 0; ovs < YM7128B_Oversampling; ++ovs) {
                 YM7128B_Float const k = ((YM7128B_Float)1 / (YM7128B_Float)YM7128B_Fixed_Max);
-                YM7128B_Float value = ((YM7128B_Float)data.outputs[c][ovs] * k);
+                YM7128B_Float wet = ((YM7128B_Float)data.outputs[c][ovs] * k);
+                YM7128B_Float dry = ((YM7128B_Float)data.inputs[YM7128B_InputChannel_Mono] * k);
+                YM7128B_Float value = (dry * args->dry) + (wet * args->wet);
                 if (!args->stream_writer(value)) {
                     perror("stream_writer()");
                     error = 1;
@@ -736,7 +947,10 @@ static int RunFloat(Args const* args)
 
         for (int c = 0; c < YM7128B_OutputChannel_Count; ++c) {
             for (int ovs = 0; ovs < YM7128B_Oversampling; ++ovs) {
-                if (!args->stream_writer(data.outputs[c][ovs])) {
+                YM7128B_Float wet = data.outputs[c][ovs];
+                YM7128B_Float dry = data.inputs[YM7128B_InputChannel_Mono];
+                YM7128B_Float value = (dry * args->dry) + (wet * args->wet);
+                if (!args->stream_writer(value)) {
                     perror("stream_writer()");
                     error = 1;
                     goto end;
@@ -785,7 +999,10 @@ static int RunIdeal(Args const* args)
         YM7128B_ChipIdeal_Process(chip, &data);
 
         for (int c = 0; c < YM7128B_OutputChannel_Count; ++c) {
-            if (!args->stream_writer(data.outputs[c])) {
+            YM7128B_Float wet = data.outputs[c];
+            YM7128B_Float dry = data.inputs[YM7128B_InputChannel_Mono];
+            YM7128B_Float value = (dry * args->dry) + (wet * args->wet);
+            if (!args->stream_writer(value)) {
                 perror("stream_writer()");
                 error = 1;
                 goto end;

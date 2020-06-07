@@ -5,7 +5,7 @@ This library aims to emulate the
 
 ![Block diagram](doc/block_diagram.png)
 
-The original goal is to contibute to the emulation of the *AdLib Gold* sound
+The original goal is to contribute to the emulation of the *AdLib Gold* sound
 card, which used such integrated circuit to add surround effects to the audio
 output, as heard in the beautiful soundtrack of the *Dune* videogame, made
 specifically for that rare sound card.

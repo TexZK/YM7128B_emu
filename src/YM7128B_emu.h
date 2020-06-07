@@ -54,6 +54,12 @@ extern "C" {
 
 // ============================================================================
 
+#define YM7128B_VERSION "0.1.0"
+
+char const* YM7128B_GetVersion(void);
+
+// ============================================================================
+
 typedef uint8_t  YM7128B_Address;   //!< Address data type
 typedef uint8_t  YM7128B_Register;  //!< Register data type
 typedef uint16_t YM7128B_Tap;       //!< Tap data type

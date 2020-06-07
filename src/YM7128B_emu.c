@@ -30,6 +30,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ============================================================================
 
+char const* YM7128B_GetVersion(void)
+{
+    return YM7128B_VERSION;
+}
+
+// ============================================================================
+
 signed short const YM7128B_GainDecibel_Table[YM7128B_Gain_Data_Count / 2] =
 {
     -10000,  // -oo

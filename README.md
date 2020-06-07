@@ -48,13 +48,13 @@ In the following table, an overview of the features of each engine:
 |-----------------------|-----------------------------|-----------------------------|-------------------------|
 | Input filter          | suggested: 6th order 15 kHz | suggested: 6th order 15 kHz | not required            |
 | Input signal          | Q1.13                       | double, normalized          | double                  |
-| Input rate            | 23.6 kHz                    | 23.6 kHz                    | suggested: above 40 kHz |
+| Input rate            | 23549 Hz                    | 23549 Hz                    | suggested: above 40 kHz |
 | Saturated arithmetics | yes                         | yes, normalized             | no                      |
 | Signal operand        | Q1.15                       | double                      | double                  |
 | Gain operand          | Q1.11                       | double                      | double                  |
 | Feedback operand      | Q1.5                        | double                      | double                  |
 | Oversampler operand   | Q1.11                       | double                      | no oversampling         |
-| Output rate           | 47.1 kHz                    | 47.1 kHz                    | same as input           |
+| Output rate           | 47098 Hz                    | 47098 Hz                    | same as input           |
 | Output signal         | Q1.13                       | double, normalized          | double                  |
 | Output filter         | suggested: 3rd order 15 kHz | suggested: 3rd order 15 kHz | not required            |
 | Status memory         | allocated by the user       | allocated by the user       | allocated by the user   |
@@ -72,20 +72,20 @@ into your project.
 All the engines implement the same conceptual flow:
 
 1. Status memory allocation.
-2. Call *Ctor()* method to invalidate internal data.
-3. Call *Reset()* method to clear emulated registers.
-4. Call *SetSampleRate()* to allocate internal delay memory
+2. Call **Ctor()** method to invalidate internal data.
+3. Call **Reset()** method to clear emulated registers.
+4. Call **SetSampleRate()** to allocate internal delay memory
    (only for *Ideal* engine).
-5. Call *Start()* to start the algorithms.
+5. Call **Start()** to start the algorithms.
 6. Processing loop:
     1. Filter input samples.
     2. Resample input samples.
     3. For each sample:
-       1. Call *Process()* method, with appropriate data types.
+       1. Call **Process()** method, with appropriate data types.
     4. Resample output samples.
     5. Filter output samples.
-7. Call *Stop()* method to stop the algorithms.
-8. Call *Dtor()* method to deallocate and invalidate internal data.
+7. Call **Stop()** method to stop the algorithms.
+8. Call **Dtor()** method to deallocate and invalidate internal data.
 9. Status memory deallocation.
 
 Register access timings are not emulated.
@@ -112,11 +112,11 @@ welcome to realtime processing.
 
 ### Libraries
 
-This library does not provide sample rate conversion itself, because proper 
+This library does not provide sample rate conversion itself, because proper
 conversion (without audible distortion) is not trivial at all. Instead, there
-are many libraries available, each with its quality rating, performance, 
+are many libraries available, each with its quality rating, performance,
 and licensing.
-You can find a comprehensive comparison 
+You can find a comprehensive comparison
 [at Infinite Wave's website](https://src.infinitewave.ca/).
 
 Personally, I have tried the following open source libraries with success:
@@ -304,3 +304,15 @@ area, thanks to the mirrored coefficient values.
 I am no expert, but it looks like minimum-phase is also not welcome to audio,
 because of phase-incoherence among frequencies, despite having shorter delays.
 I left the possibility to choose the minimum-phase feature by configuration.
+
+_______________________________________________________________________________
+
+## YM7128B_pipe example
+
+This repository provides a fully-featured example. It is a stream processor, in
+that it processes sample data coming from *standard input*, elaborates it, and
+generates outputs on the *standard output*.
+
+Please refer to its own help page, by calling the canonical
+`YM7128B_pipe --help`, or reading it embedded in
+[its source code](example/YM7128B_pipe.c).

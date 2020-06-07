@@ -68,9 +68,9 @@ OPTION (evaluated as per command line argument order):\n\
 -h, --help\n\
     Prints this help message and quits.\n\
 \n\
--m, --engine MODE\n\
+-e, --engine ENGINE\n\
     Chip engine; default: fixed.\n\
-    See MODE table.\n\
+    See ENGINE table.\n\
 \n\
 -r, --rate RATE\n\
     Sample rate [Hz]; default: 23549.\n\
@@ -88,6 +88,13 @@ OPTION (evaluated as per command line argument order):\n\
 --wet DECIBEL\n\
     Wet (processed) output volume multiplier [dB]; default: 0.\n\
     Values outside range (-128; +128) do mute.\n\
+\n\
+\n\
+ENGINE:\n\
+\n\
+- fixed:  Fixed-point (default).\n\
+- float:  Floating-point.\n\
+- ideal:  Ideal model.\n\
 \n\
 \n\
 FORMAT:\n\
@@ -108,13 +115,6 @@ FORMAT:\n\
 | FLOAT_BE   |   32 | yes  | big    |\n\
 | FLOAT64_LE |   64 | yes  | little |\n\
 | FLOAT64_BE |   64 | yes  | big    |\n\
-\n\
-\n\
-MODE:\n\
-\n\
-- fixed:  Fixed-point (default).\n\
-- float:  Floating-point.\n\
-- ideal:  Ideal enginel.\n\
 \n\
 \n\
 PRESET:\n\

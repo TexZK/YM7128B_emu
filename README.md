@@ -316,3 +316,28 @@ generates outputs on the *standard output*.
 Please refer to its own help page, by calling the canonical
 `YM7128B_pipe --help`, or reading it embedded in
 [its source code](example/YM7128B_pipe.c).
+
+### Usage example with Lubuntu 20.04
+
+1. Ensure the following packages are installed:
+
+```bash
+sudo apt install alsa-utils build-essential
+```
+
+2. Enter [example](example) folder and run [make_gcc.sh](example/make_gcc.sh):
+
+```bash
+cd example
+bash make_gcc.sh
+```
+
+3. You should find the generated executable file as `YM7128B_pipe`.
+
+4. Play some audio directly with `aplay` (the `\\` is for command line
+   continuation), using the `dune/warsong` preset:
+
+```bash
+./YM7128B_pipe -r 23550 -f S16_LE --preset dune/warsong < sample_mono_23550Hz_S16LE.raw \
+| aplay -c 2 -r 47100 -f S16_LE
+```

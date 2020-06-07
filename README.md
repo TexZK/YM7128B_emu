@@ -334,7 +334,7 @@ bash make_gcc.sh
 
 3. You should find the generated executable file as `YM7128B_pipe`.
 
-4. Play some audio directly with `aplay` (the `\\` is for command line
+4. Play some audio directly with `aplay` (the `\` is for command line
    continuation), using the `dune/warsong` preset:
 
 ```bash

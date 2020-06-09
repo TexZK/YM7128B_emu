@@ -97,13 +97,15 @@ ENGINE:\n\
 \n\
 - fixed:  Fixed-point (default).\n\
 - float:  Floating-point.\n\
-- ideal:  Ideal model.\n\
+- ideal:  Ideal float model.\n\
+- short:  Ideal short model.\n\
 \n\
 \n\
 FORMAT:\n\
 \n\
 | Name       | Bits | Sign | Endian |\n\
 |------------|------|------|--------|\n\
+| dummy      |    0 | no   | same   |\n\
 | U8         |    8 | no   | same   |\n\
 | S8         |    8 | yes  | same   |\n\
 | U16_LE     |   16 | no   | little |\n\
@@ -179,6 +181,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\
 #error "Unsupported __BYTE_ORDER"
 #endif
 
+
+int ReadDummy(YM7128B_Float* dst) {
+    *dst = 0;
+    return 1;
+}
 
 int ReadU8(YM7128B_Float* dst) {
     int8_t src;
@@ -350,6 +357,11 @@ int ReadF64B(YM7128B_Float* dst) {
 }
 
 
+int WriteDummy(YM7128B_Float src) {
+    (void)src;
+    return 1;
+}
+
 int WriteU8(YM7128B_Float src) {
     double scaled = src * -(double)INT8_MIN;
     int8_t dst = (int8_t)fmin(fmax(scaled, INT8_MIN), INT8_MAX);
@@ -471,21 +483,22 @@ struct FormatTable {
     STREAM_WRITER writer;
 } const FORMAT_TABLE[] =
 {
-    { "U8",         ReadU8,   WriteU8   },
-    { "S8",         ReadS8,   WriteS8   },
-    { "U16_LE",     ReadU16L, WriteU16L },
-    { "U16_BE",     ReadU16B, WriteU16B },
-    { "S16_LE",     ReadS16L, WriteS16L },
-    { "S16_BE",     ReadS16B, WriteS16B },
-    { "U32_LE",     ReadU32L, WriteU32L },
-    { "U32_BE",     ReadU32B, WriteU32B },
-    { "S32_LE",     ReadS32L, WriteS32L },
-    { "S32_BE",     ReadS32B, WriteS32B },
-    { "FLOAT_LE",   ReadF32L, WriteF32L },
-    { "FLOAT_BE",   ReadF32B, WriteF32B },
-    { "FLOAT64_LE", ReadF64L, WriteF64L },
-    { "FLOAT64_BE", ReadF64B, WriteF64B },
-    { NULL,         NULL,     NULL      }
+    { "dummy",      ReadDummy, WriteDummy },
+    { "U8",         ReadU8,    WriteU8    },
+    { "S8",         ReadS8,    WriteS8    },
+    { "U16_LE",     ReadU16L,  WriteU16L  },
+    { "U16_BE",     ReadU16B,  WriteU16B  },
+    { "S16_LE",     ReadS16L,  WriteS16L  },
+    { "S16_BE",     ReadS16B,  WriteS16B  },
+    { "U32_LE",     ReadU32L,  WriteU32L  },
+    { "U32_BE",     ReadU32B,  WriteU32B  },
+    { "S32_LE",     ReadS32L,  WriteS32L  },
+    { "S32_BE",     ReadS32B,  WriteS32B  },
+    { "FLOAT_LE",   ReadF32L,  WriteF32L  },
+    { "FLOAT_BE",   ReadF32B,  WriteF32B  },
+    { "FLOAT64_LE", ReadF64L,  WriteF64L  },
+    { "FLOAT64_BE", ReadF64B,  WriteF64B  },
+    { NULL,         NULL,      NULL       }
 };
 
 
@@ -497,6 +510,7 @@ struct ChipModeTable {
     { "fixed", YM7128B_ChipEngine_Fixed },
     { "float", YM7128B_ChipEngine_Float },
     { "ideal", YM7128B_ChipEngine_Ideal },
+    { "short", YM7128B_ChipEngine_Short },
     { NULL,    YM7128B_ChipEngine_Count }
 };
 
@@ -647,6 +661,7 @@ static uint8_t HexToByte(char const* str);
 static int RunFixed(Args const* args);
 static int RunFloat(Args const* args);
 static int RunIdeal(Args const* args);
+static int RunShort(Args const* args);
 
 
 static uint8_t HexToByte(char const* str)
@@ -712,8 +727,7 @@ int main(int argc, char const* argv[])
                 args.dry = (YM7128B_Float)pow(10, (double)db / 20);
             }
         }
-        else if (!strcmp(argv[i], "-f") ||
-            !strcmp(argv[i], "--format")) {
+        else if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--format")) {
             char const* label = argv[++i];
             int j;
             for (j = 0; FORMAT_TABLE[j].label; ++j) {
@@ -728,8 +742,7 @@ int main(int argc, char const* argv[])
                 return 1;
             }
         }
-        else if (!strcmp(argv[i], "-m") ||
-                 !strcmp(argv[i], "--engine")) {
+        else if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--engine")) {
             char const* label = argv[++i];
             int j;
             for (j = 0; MODE_TABLE[j].label; ++j) {
@@ -760,8 +773,7 @@ int main(int argc, char const* argv[])
                 args.regs[r] = data[r];
             }
         }
-        else if (!strcmp(argv[i], "-r") ||
-                 !strcmp(argv[i], "--rate")) {
+        else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--rate")) {
             long rate = strtol(argv[++i], NULL, 10);
             if (errno || rate < 1) {
                 fprintf(stderr, "Invalid rate: %s", argv[i]);
@@ -856,6 +868,9 @@ int main(int argc, char const* argv[])
 
     case YM7128B_ChipEngine_Ideal:
         return RunIdeal(&args);
+
+    case YM7128B_ChipEngine_Short:
+        return RunShort(&args);
 
     default:
         return 1;
@@ -980,7 +995,7 @@ static int RunIdeal(Args const* args)
         return 1;
     }
     YM7128B_ChipIdeal_Ctor(chip);
-    YM7128B_ChipIdeal_SetSampleRate(chip, args->rate);
+    YM7128B_ChipIdeal_Setup(chip, args->rate);
     YM7128B_ChipIdeal_Reset(chip);
     for (YM7128B_Address r = 0; r < (YM7128B_Address)YM7128B_Reg_Count; ++r) {
         YM7128B_ChipIdeal_Write(chip, r, args->regs[r]);
@@ -1018,6 +1033,62 @@ static int RunIdeal(Args const* args)
 end:
     YM7128B_ChipIdeal_Stop(chip);
     YM7128B_ChipIdeal_Dtor(chip);
+    free(chip);
+    return error;
+}
+
+
+static int RunShort(Args const* args)
+{
+    YM7128B_ChipShort* chip;
+    chip = (YM7128B_ChipShort*)malloc(sizeof(YM7128B_ChipShort));
+    if (!chip) {
+        return 1;
+    }
+    YM7128B_ChipShort_Ctor(chip);
+    YM7128B_ChipShort_Setup(chip, args->rate);
+    YM7128B_ChipShort_Reset(chip);
+    for (YM7128B_Address r = 0; r < (YM7128B_Address)YM7128B_Reg_Count; ++r) {
+        YM7128B_ChipShort_Write(chip, r, args->regs[r]);
+    }
+    YM7128B_ChipShort_Start(chip);
+    int error = 0;
+
+    while (!feof(stdin)) {
+        YM7128B_ChipShort_Process_Data data;
+
+        for (int c = 0; c < YM7128B_InputChannel_Count; ++c) {
+            YM7128B_Float value;
+            if (!args->stream_reader(&value)) {
+                if (ferror(stdin)) {
+                    perror("stream_reader()");
+                    error = 1;
+                }
+                goto end;
+            }
+            YM7128B_Float const k = (YM7128B_Float)YM7128B_Fixed_Max;
+            value = YM7128B_ClampFloat(value);
+            data.inputs[c] = (YM7128B_Fixed)(value * k);
+        }
+
+        YM7128B_ChipShort_Process(chip, &data);
+
+        for (int c = 0; c < YM7128B_OutputChannel_Count; ++c) {
+            YM7128B_Float const k = ((YM7128B_Float)1 / (YM7128B_Float)YM7128B_Fixed_Max);
+            YM7128B_Float wet = ((YM7128B_Float)data.outputs[c] * k);
+            YM7128B_Float dry = ((YM7128B_Float)data.inputs[YM7128B_InputChannel_Mono] * k);
+            YM7128B_Float value = (dry * args->dry) + (wet * args->wet);
+            if (!args->stream_writer(value)) {
+                perror("stream_writer()");
+                error = 1;
+                goto end;
+            }
+        }
+    }
+
+end:
+    YM7128B_ChipShort_Stop(chip);
+    YM7128B_ChipShort_Dtor(chip);
     free(chip);
     return error;
 }

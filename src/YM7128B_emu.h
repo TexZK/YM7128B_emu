@@ -212,14 +212,16 @@ typedef enum YM7128B_ChipEngine {
     YM7128B_ChipEngine_Fixed = 0,
     YM7128B_ChipEngine_Float,
     YM7128B_ChipEngine_Ideal,
+    YM7128B_ChipEngine_Short,
     YM7128B_ChipEngine_Count
 } YM7128B_ChipEngine;
 
 // ----------------------------------------------------------------------------
 
-extern signed short const YM7128B_GainDecibel_Table[YM7128B_Gain_Data_Count / 2];
+extern signed char const YM7128B_GainDecibel_Table[YM7128B_Gain_Data_Count / 2];
 extern YM7128B_Fixed const YM7128B_GainFixed_Table[YM7128B_Gain_Data_Count];
 extern YM7128B_Float const YM7128B_GainFloat_Table[YM7128B_Gain_Data_Count];
+extern YM7128B_Fixed const YM7128B_GainShort_Table[YM7128B_Gain_Data_Count];
 extern YM7128B_Tap const YM7128B_Tap_Table[YM7128B_Tap_Value_Count];
 
 // ----------------------------------------------------------------------------
@@ -235,7 +237,10 @@ YM7128B_Tap YM7128B_RegisterToTap(YM7128B_Register data)
 // ----------------------------------------------------------------------------
 
 YM7128B_INLINE
-YM7128B_TapIdeal YM7128B_RegisterToTapIdeal(YM7128B_Register data, YM7128B_TapIdeal sample_rate)
+YM7128B_TapIdeal YM7128B_RegisterToTapIdeal(
+    YM7128B_Register data,
+    YM7128B_TapIdeal sample_rate
+)
 {
     YM7128B_Register i = data & YM7128B_Tap_Value_Mask;
     YM7128B_TapIdeal t = (YM7128B_TapIdeal)((i * (sample_rate / 10)) / (YM7128B_Tap_Value_Count - 1));
@@ -265,6 +270,16 @@ YM7128B_Float YM7128B_RegisterToGainFloat(YM7128B_Register data)
 // ----------------------------------------------------------------------------
 
 YM7128B_INLINE
+YM7128B_Fixed YM7128B_RegisterToGainShort(YM7128B_Register data)
+{
+    YM7128B_Register i = data & YM7128B_Gain_Data_Mask;
+    YM7128B_Fixed g = YM7128B_GainShort_Table[i];
+    return g;
+}
+
+// ----------------------------------------------------------------------------
+
+YM7128B_INLINE
 YM7128B_Fixed YM7128B_RegisterToCoeffFixed(YM7128B_Register data)
 {
     YM7128B_Register r = data & YM7128B_Coeff_Value_Mask;
@@ -286,12 +301,23 @@ YM7128B_Float YM7128B_RegisterToCoeffFloat(YM7128B_Register data)
 // ----------------------------------------------------------------------------
 
 YM7128B_INLINE
+YM7128B_Fixed YM7128B_RegisterToCoeffShort(YM7128B_Register data)
+{
+    YM7128B_Register r = data & YM7128B_Coeff_Value_Mask;
+    YM7128B_Register sh = YM7128B_Fixed_Bits - YM7128B_Coeff_Value_Bits;
+    YM7128B_Fixed c = (YM7128B_Fixed)r << sh;
+    return c;
+}
+
+// ----------------------------------------------------------------------------
+
+YM7128B_INLINE
 YM7128B_Fixed YM7128B_ClampFixed(YM7128B_Accumulator signal)
 {
     if (signal < YM7128B_Fixed_Min) {
         signal = YM7128B_Fixed_Min;
     }
-    else if (signal > YM7128B_Fixed_Max) {
+    if (signal > YM7128B_Fixed_Max) {
         signal = YM7128B_Fixed_Max;
     }
     return (YM7128B_Fixed)signal & (YM7128B_Fixed)YM7128B_Operand_Mask;
@@ -305,10 +331,24 @@ YM7128B_Float YM7128B_ClampFloat(YM7128B_Float signal)
     if (signal < YM7128B_Float_Min) {
         return YM7128B_Float_Min;
     }
-    else if (signal > YM7128B_Float_Max) {
+    if (signal > YM7128B_Float_Max) {
         return YM7128B_Float_Max;
     }
     return signal;
+}
+
+// ----------------------------------------------------------------------------
+
+YM7128B_INLINE
+YM7128B_Fixed YM7128B_ClampShort(YM7128B_Accumulator signal)
+{
+    if (signal < YM7128B_Fixed_Min) {
+        return (YM7128B_Fixed)YM7128B_Fixed_Min;
+    }
+    if (signal > YM7128B_Fixed_Max) {
+        return (YM7128B_Fixed)YM7128B_Fixed_Max;
+    }
+    return (YM7128B_Fixed)signal;
 }
 
 // ----------------------------------------------------------------------------
@@ -329,6 +369,18 @@ YM7128B_INLINE
 YM7128B_Float YM7128B_ClampAddFloat(YM7128B_Float a, YM7128B_Float b)
 {
     YM7128B_Float y = YM7128B_ClampFloat(a + b);
+    return y;
+}
+
+// ----------------------------------------------------------------------------
+
+YM7128B_INLINE
+YM7128B_Fixed YM7128B_ClampAddShort(YM7128B_Fixed a, YM7128B_Fixed b)
+{
+    YM7128B_Accumulator aa = a;
+    YM7128B_Accumulator bb = b;
+    YM7128B_Accumulator ss = aa + bb;
+    YM7128B_Fixed y = YM7128B_ClampShort(ss);
     return y;
 }
 
@@ -363,6 +415,18 @@ YM7128B_Float YM7128B_MulFloat(YM7128B_Float a, YM7128B_Float b)
     return y;
 }
 
+// ----------------------------------------------------------------------------
+
+YM7128B_INLINE
+YM7128B_Fixed YM7128B_MulShort(YM7128B_Fixed a, YM7128B_Fixed b)
+{
+    YM7128B_Accumulator aa = a;
+    YM7128B_Accumulator bb = b;
+    YM7128B_Accumulator mm = aa * bb;
+    YM7128B_Fixed y = (YM7128B_Fixed)(mm >> YM7128B_Fixed_Decimals);
+    return y;
+}
+
 // ============================================================================
 
 typedef uint_fast8_t YM7128B_Oversampler_Index;
@@ -384,8 +448,10 @@ extern YM7128B_Fixed const YM7128B_OversamplerFixed_Kernel[YM7128B_Oversampler_L
 // ----------------------------------------------------------------------------
 
 YM7128B_INLINE
-void YM7128B_OversamplerFixed_Clear(YM7128B_OversamplerFixed* self,
-                                    YM7128B_Fixed input)
+void YM7128B_OversamplerFixed_Clear(
+    YM7128B_OversamplerFixed* self,
+    YM7128B_Fixed input
+)
 {
     for (YM7128B_Oversampler_Index index = 0; index < YM7128B_Oversampler_Length; ++index) {
         self->buffer_[index] = input;
@@ -402,8 +468,10 @@ void YM7128B_OversamplerFixed_Reset(YM7128B_OversamplerFixed* self)
 
 // ----------------------------------------------------------------------------
 
-YM7128B_Fixed YM7128B_OversamplerFixed_Process(YM7128B_OversamplerFixed* self,
-                                               YM7128B_Fixed input);
+YM7128B_Fixed YM7128B_OversamplerFixed_Process(
+    YM7128B_OversamplerFixed* self,
+    YM7128B_Fixed input
+);
 
 // ============================================================================
 
@@ -417,8 +485,10 @@ extern YM7128B_Float const YM7128B_OversamplerFloat_Kernel[YM7128B_Oversampler_L
 // ----------------------------------------------------------------------------
 
 YM7128B_INLINE
-void YM7128B_OversamplerFloat_Clear(YM7128B_OversamplerFloat* self,
-                                    YM7128B_Float input)
+void YM7128B_OversamplerFloat_Clear(
+    YM7128B_OversamplerFloat* self,
+    YM7128B_Float input
+)
 {
     for (YM7128B_Oversampler_Index index = 0; index < YM7128B_Oversampler_Length; ++index) {
         self->buffer_[index] = input;
@@ -435,8 +505,10 @@ void YM7128B_OversamplerFloat_Reset(YM7128B_OversamplerFloat* self)
 
 // ----------------------------------------------------------------------------
 
-YM7128B_Float YM7128B_OversamplerFloat_Process(YM7128B_OversamplerFloat* self,
-                                               YM7128B_Float input);
+YM7128B_Float YM7128B_OversamplerFloat_Process(
+    YM7128B_OversamplerFloat* self,
+    YM7128B_Float input
+);
 
 // ============================================================================
 
@@ -469,15 +541,21 @@ void YM7128B_ChipFixed_Start(YM7128B_ChipFixed* self);
 
 void YM7128B_ChipFixed_Stop(YM7128B_ChipFixed* self);
 
-void YM7128B_ChipFixed_Process(YM7128B_ChipFixed* self,
-                               YM7128B_ChipFixed_Process_Data* data);
+void YM7128B_ChipFixed_Process(
+    YM7128B_ChipFixed* self,
+    YM7128B_ChipFixed_Process_Data* data
+);
 
-YM7128B_Register YM7128B_ChipFixed_Read(YM7128B_ChipFixed const* self,
-                                        YM7128B_Address address);
+YM7128B_Register YM7128B_ChipFixed_Read(
+    YM7128B_ChipFixed const* self,
+    YM7128B_Address address
+);
 
-void YM7128B_ChipFixed_Write(YM7128B_ChipFixed* self,
-                             YM7128B_Address address,
-                             YM7128B_Register data);
+void YM7128B_ChipFixed_Write(
+    YM7128B_ChipFixed* self,
+    YM7128B_Address address,
+    YM7128B_Register data
+);
 
 // ============================================================================
 
@@ -510,15 +588,21 @@ void YM7128B_ChipFloat_Start(YM7128B_ChipFloat* self);
 
 void YM7128B_ChipFloat_Stop(YM7128B_ChipFloat* self);
 
-void YM7128B_ChipFloat_Process(YM7128B_ChipFloat* self,
-                               YM7128B_ChipFloat_Process_Data* data);
+void YM7128B_ChipFloat_Process(
+    YM7128B_ChipFloat* self,
+    YM7128B_ChipFloat_Process_Data* data
+);
 
-YM7128B_Register YM7128B_ChipFloat_Read(YM7128B_ChipFloat const* self,
-                                        YM7128B_Address address);
+YM7128B_Register YM7128B_ChipFloat_Read(
+    YM7128B_ChipFloat const* self,
+    YM7128B_Address address
+);
 
-void YM7128B_ChipFloat_Write(YM7128B_ChipFloat* self,
-                             YM7128B_Address address,
-                             YM7128B_Register data);
+void YM7128B_ChipFloat_Write(
+    YM7128B_ChipFloat* self,
+    YM7128B_Address address,
+    YM7128B_Register data
+);
 
 // ============================================================================
 
@@ -552,18 +636,79 @@ void YM7128B_ChipIdeal_Start(YM7128B_ChipIdeal* self);
 
 void YM7128B_ChipIdeal_Stop(YM7128B_ChipIdeal* self);
 
-void YM7128B_ChipIdeal_Process(YM7128B_ChipIdeal* self,
-                               YM7128B_ChipIdeal_Process_Data* data);
+void YM7128B_ChipIdeal_Process(
+    YM7128B_ChipIdeal* self,
+    YM7128B_ChipIdeal_Process_Data* data
+);
 
-YM7128B_Register YM7128B_ChipIdeal_Read(YM7128B_ChipIdeal const* self,
-                                        YM7128B_Address address);
+YM7128B_Register YM7128B_ChipIdeal_Read(
+    YM7128B_ChipIdeal const* self,
+    YM7128B_Address address
+);
 
-void YM7128B_ChipIdeal_Write(YM7128B_ChipIdeal* self,
-                             YM7128B_Address address,
-                             YM7128B_Register data);
+void YM7128B_ChipIdeal_Write(
+    YM7128B_ChipIdeal* self,
+    YM7128B_Address address,
+    YM7128B_Register data
+);
 
-void YM7128B_ChipIdeal_SetSampleRate(YM7128B_ChipIdeal* self,
-                                     YM7128B_TapIdeal sample_rate);
+void YM7128B_ChipIdeal_Setup(
+    YM7128B_ChipIdeal* self,
+    YM7128B_TapIdeal sample_rate
+);
+
+// ============================================================================
+
+typedef struct YM7128B_ChipShort
+{
+    YM7128B_Register regs_[YM7128B_Reg_Count];
+    YM7128B_Fixed gains_[YM7128B_Reg_T0];
+    YM7128B_TapIdeal taps_[YM7128B_Tap_Count];
+    YM7128B_Fixed t0_d_;
+    YM7128B_TapIdeal tail_;
+    YM7128B_Fixed* buffer_;
+    YM7128B_TapIdeal length_;
+    YM7128B_TapIdeal sample_rate_;
+} YM7128B_ChipShort;
+
+typedef struct YM7128B_ChipShort_Process_Data
+{
+    YM7128B_Fixed inputs[YM7128B_InputChannel_Count];
+    YM7128B_Fixed outputs[YM7128B_OutputChannel_Count];
+} YM7128B_ChipShort_Process_Data;
+
+// ----------------------------------------------------------------------------
+
+void YM7128B_ChipShort_Ctor(YM7128B_ChipShort* self);
+
+void YM7128B_ChipShort_Dtor(YM7128B_ChipShort* self);
+
+void YM7128B_ChipShort_Reset(YM7128B_ChipShort* self);
+
+void YM7128B_ChipShort_Start(YM7128B_ChipShort* self);
+
+void YM7128B_ChipShort_Stop(YM7128B_ChipShort* self);
+
+void YM7128B_ChipShort_Process(
+    YM7128B_ChipShort* self,
+    YM7128B_ChipShort_Process_Data* data
+);
+
+YM7128B_Register YM7128B_ChipShort_Read(
+    YM7128B_ChipShort const* self,
+    YM7128B_Address address
+);
+
+void YM7128B_ChipShort_Write(
+    YM7128B_ChipShort* self,
+    YM7128B_Address address,
+    YM7128B_Register data
+);
+
+void YM7128B_ChipShort_Setup(
+    YM7128B_ChipShort* self,
+    YM7128B_TapIdeal sample_rate
+);
 
 // ============================================================================
 

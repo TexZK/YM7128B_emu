@@ -28,39 +28,44 @@ _______________________________________________________________________________
 The library provides chip emulation with three engines:
 
 - **Fixed**: it should emulate an actual chip, using fixed point arithmetics.
-    It features all the actual chip constraints, like sample rates, the presence
-    of an output oversampler, and saturated arithmetics. Algorithms are rather
-    slow to compute, and resampling is typically heavy.
+    It features all the actual chip constraints, like sample rates, the
+    presence of an output oversampler, and saturated arithmetics. Algorithms
+    are rather slow to compute, and resampling is typically heavy.
 
 - **Float**: like *Fixed*, using floating point arithmetics instead.
     It increases the sound quality, while keeping the architecture similar to
     that of an actual chip. Algorithms are fast to compute, but resampling
     still has a significant impact on performance.
 
-- **Ideal**: it represents an ideal implementation of the algorithms. Arithmetics
-    are in floating point, there are no saturations, and no sample rate
-    conversions, not even at the output stage. Algorithms are fast, despite
-    the loss in accuracy with respect to an actual chip.
+- **Ideal**: it represents an ideal implementation of the algorithms.
+    Arithmetics are in floating point, there are no saturations, and no sample
+    rate conversions, not even at the output stage. Algorithms are fast,
+    despite the loss in accuracy with respect to an actual chip.
+
+- **Short**: somewhat an hybrid of *Fixed* and *Ideal*, in that it uses
+    full-range 16-bit fixed point arithmetics with saturations, but without
+    sample rate conversions. Algorithms are fast, despite the loss in accuracy
+    with respect to an actual chip.
 
 In the following table, an overview of the features of each engine:
 
-| Feature               | *Fixed*                     | *Float*                     | *Ideal*                 |
-|-----------------------|-----------------------------|-----------------------------|-------------------------|
-| Input filter          | suggested: 6th order 15 kHz | suggested: 6th order 15 kHz | not required            |
-| Input signal          | Q1.13                       | double, normalized          | double                  |
-| Input rate            | 23550 Hz                    | 23550 Hz                    | suggested: above 40 kHz |
-| Saturated arithmetics | yes                         | yes, normalized             | no                      |
-| Signal operand        | Q1.15                       | double                      | double                  |
-| Gain operand          | Q1.11                       | double                      | double                  |
-| Feedback operand      | Q1.5                        | double                      | double                  |
-| Oversampler operand   | Q1.11                       | double                      | no oversampling         |
-| Output rate           | 47100 Hz                    | 47100 Hz                    | same as input           |
-| Output signal         | Q1.13                       | double, normalized          | double                  |
-| Output filter         | suggested: 3rd order 15 kHz | suggested: 3rd order 15 kHz | not required            |
-| Status memory         | allocated by the user       | allocated by the user       | allocated by the user   |
-| Delay memory          | part of the status          | part of the status          | dynamic heap allocation |
-| Performance           | very slow                   | slow                        | fast                    |
-| Accuracy              | best?                       | good                        | poor                    |
+| Feature               | *Fixed*                     | *Float*                     | *Ideal*                 | *Short*                 |
+|-----------------------|-----------------------------|-----------------------------|-------------------------|-------------------------|
+| Input filter          | suggested: 6th order 15 kHz | suggested: 6th order 15 kHz | not required            | not required            |
+| Input signal          | Q1.13                       | double, normalized          | double                  | Q1.15                   |
+| Input rate            | 23550 Hz                    | 23550 Hz                    | suggested: above 40 kHz | suggested: above 40 kHz |
+| Saturated arithmetics | yes                         | yes, normalized             | no                      | yes                     |
+| Signal operand        | Q1.15                       | double                      | double                  | Q1.15                   |
+| Gain operand          | Q1.11                       | double                      | double                  | Q1.15                   |
+| Feedback operand      | Q1.5                        | double                      | double                  | Q1.5                    |
+| Oversampler operand   | Q1.11                       | double                      | no oversampling         | no oversampling         |
+| Output rate           | 47100 Hz                    | 47100 Hz                    | same as input           | same as input           |
+| Output signal         | Q1.13                       | double, normalized          | double                  | Q1.15                   |
+| Output filter         | suggested: 3rd order 15 kHz | suggested: 3rd order 15 kHz | not required            | not required            |
+| Status memory         | allocated by the user       | allocated by the user       | allocated by the user   | allocated by the user   |
+| Delay memory          | part of the status          | part of the status          | dynamic heap allocation | dynamic heap allocation |
+| Performance           | very slow                   | slow                        | fast                    | fast                    |
+| Accuracy              | best?                       | good                        | poor                    | poor                    |
 
 _______________________________________________________________________________
 

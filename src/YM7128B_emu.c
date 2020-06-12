@@ -1067,8 +1067,7 @@ void YM7128B_ChipShort_Process(
         YM7128B_Fixed total = accum;
         YM7128B_Fixed v = self->gains_[YM7128B_Reg_VL + channel];
         YM7128B_Fixed total_v = YM7128B_MulShort(total, v);
-        YM7128B_Fixed og = 1 / (YM7128B_Fixed)YM7128B_Oversampling;
-        YM7128B_Fixed oversampled = YM7128B_MulShort(total_v, og);
+        YM7128B_Fixed oversampled = total_v / (YM7128B_Fixed)YM7128B_Oversampling;
         data->outputs[channel] = oversampled;
     }
 }

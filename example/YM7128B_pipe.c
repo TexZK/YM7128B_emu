@@ -838,7 +838,7 @@ int main(int argc, char const* argv[])
         }
 
         if (errno) {
-            fprintf(stderr, "arg %d\n", i);
+            fprintf(stderr, "arg %d", i);
             perror("");
             return 1;
         }

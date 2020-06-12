@@ -742,7 +742,7 @@ int main(int argc, char const* argv[])
                 return 1;
             }
         }
-        else if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--engine")) {
+        else if (!strcmp(argv[i], "-e") || !strcmp(argv[i], "--engine")) {
             char const* label = argv[++i];
             int j;
             for (j = 0; MODE_TABLE[j].label; ++j) {

@@ -711,13 +711,13 @@ int main(int argc, char const* argv[])
 
         // Binary arguments
         if (i >= argc - 1) {
-            fprintf(stderr, "Expecting binary argument: %s", argv[i]);
+            fprintf(stderr, "Expecting binary argument: %s\n", argv[i]);
             return 1;
         }
         else if (!strcmp(argv[i], "--dry")) {
             long db = strtol(argv[++i], NULL, 10);
             if (errno) {
-                fprintf(stderr, "Invalid decibels: %s", argv[i]);
+                fprintf(stderr, "Invalid decibels: %s\n", argv[i]);
                 return 1;
             }
             if (db <= -128 || db >= 128) {
@@ -738,7 +738,7 @@ int main(int argc, char const* argv[])
                 }
             }
             if (!FORMAT_TABLE[j].label) {
-                fprintf(stderr, "Unknown format: %s", label);
+                fprintf(stderr, "Unknown format: %s\n", label);
                 return 1;
             }
         }
@@ -752,7 +752,7 @@ int main(int argc, char const* argv[])
                 }
             }
             if (!MODE_TABLE[j].label) {
-                fprintf(stderr, "Unknown engine: %s", label);
+                fprintf(stderr, "Unknown engine: %s\n", label);
                 return 1;
             }
         }
@@ -765,7 +765,7 @@ int main(int argc, char const* argv[])
                 }
             }
             if (!PRESET_TABLE[j].label) {
-                fprintf(stderr, "Unknown preset: %s", label);
+                fprintf(stderr, "Unknown preset: %s\n", label);
                 return 1;
             }
             YM7128B_Register const* data = PRESET_TABLE[j].regs;
@@ -776,7 +776,7 @@ int main(int argc, char const* argv[])
         else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--rate")) {
             long rate = strtol(argv[++i], NULL, 10);
             if (errno || rate < 1) {
-                fprintf(stderr, "Invalid rate: %s", argv[i]);
+                fprintf(stderr, "Invalid rate: %s\n", argv[i]);
                 return 1;
             }
             args.rate = (YM7128B_TapIdeal)rate;
@@ -790,12 +790,12 @@ int main(int argc, char const* argv[])
                 }
             }
             if (!REGISTER_TABLE[r].label) {
-                fprintf(stderr, "Unknown register: %s", label);
+                fprintf(stderr, "Unknown register: %s\n", label);
                 return 1;
             }
             long value = strtol(argv[++i], NULL, 16);
             if (errno || value < 0x00 || value > 0xFF) {
-                fprintf(stderr, "Invalid register value: %s", argv[i]);
+                fprintf(stderr, "Invalid register value: %s\n", argv[i]);
                 return 1;
             }
             args.regs[REGISTER_TABLE[r].value] = (YM7128B_Register)value;
@@ -810,7 +810,7 @@ int main(int argc, char const* argv[])
                 uint8_t value = HexToByte(strptr);
                 strptr += 2;
                 if (errno) {
-                    fprintf(stderr, "Invalid HEX string: %s", argv[i]);
+                    fprintf(stderr, "Invalid HEX string: %s\n", argv[i]);
                     return 1;
                 }
                 args.regs[r] = value;
@@ -822,7 +822,7 @@ int main(int argc, char const* argv[])
         else if (!strcmp(argv[i], "--wet")) {
             long db = strtol(argv[++i], NULL, 10);
             if (errno) {
-                fprintf(stderr, "Invalid decibels: %s", argv[i]);
+                fprintf(stderr, "Invalid decibels: %s\n", argv[i]);
                 return 1;
             }
             if (db <= -128 || db >= 128) {
@@ -833,12 +833,12 @@ int main(int argc, char const* argv[])
             }
         }
         else {
-            fprintf(stderr, "Unknown switch: %s", argv[i]);
+            fprintf(stderr, "Unknown switch: %s\n", argv[i]);
             return 1;
         }
 
         if (errno) {
-            fprintf(stderr, "arg %d", i);
+            fprintf(stderr, "arg %d\n", i);
             perror("");
             return 1;
         }

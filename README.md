@@ -114,7 +114,6 @@ actual bootleneck of the emulation.
 Also, sample rate conversions add delays to their outputs, which are not
 welcome to realtime processing.
 
-
 ### Libraries
 
 This library does not provide sample rate conversion itself, because proper
@@ -143,7 +142,6 @@ Suitable for realtime, and with small footprint.
 A nice modern C++ library, licensed as *GPL3*.
 Suitable for realtime, and with small footprint.
 
-
 ### Analog filtering
 
 The datasheet suggests some input and output analog filtering, to reduce
@@ -169,7 +167,6 @@ _______________________________________________________________________________
 Here you can find some descriptions and discussions about implementation
 details.
 
-
 ### Language
 
 I chose *C89* with a bit of *C99*. I was going to use *C++20* for my own
@@ -177,7 +174,6 @@ pleasure, but instead I find good old and mature C to be the best for such a
 tiny library. C is also easier to integrate with other languages, and the
 mighty features of a colossal language like C++ are more of a burden than for
 actual use in such case.
-
 
 ### Cross-platform support
 
@@ -187,7 +183,6 @@ compilation errors or ambiguity.
 Currently the library is developed and tested under *Windows* with *MSVC++ 14*.
 Of course, I will at least provide support for *gcc* and *clang* under *Linux*.
 I do not have access to *macOS*, but I guess the *Linux* support should fit.
-
 
 ### Code style
 
@@ -200,7 +195,6 @@ at this stage of development. Actually I am not satisfied about how the
 *MSVC++* compiler is generating machine code, and I guess that optimizing the
 code for vectoring should improve the performance by some margin, especially
 the parts for parallel 8-tap delay and output oversampling.
-
 
 ### Sample format
 
@@ -222,7 +216,6 @@ I am actually concerned about the bit size of each sample. Its sounds like the
 am emulating the system right now.
 Tests with 16-bit sample emulation sound less worse, so I am wondering whether
 signals are actually processed as 14-bit or more.
-
 
 ### Multiplication
 
@@ -276,7 +269,6 @@ I guess the negative coefficients are actually loaded as the one-complement
 (bit flip) instead of the two-complement, as often seen in Yamaha's
 synthesizers of the same age, to save silicon area despite a tiny gain error.
 
-
 ### Digital delay line
 
 The digital delay line allows up to 100 ms of delay at the nominal input rate.
@@ -285,7 +277,6 @@ Such buffer should be a shifting FIFO with 32 pre-determined tap positions.
 
 The delay line emulation is actually implemented as a random-access ring
 buffer, as shifting the whole buffer at each input sample is a waste of time.
-
 
 ### Oversampler
 
@@ -308,7 +299,23 @@ I also think that the kernel is not *minimum-phase*, to save further silicon
 area, thanks to the mirrored coefficient values.
 I am no expert, but it looks like minimum-phase is also not welcome to audio,
 because of phase-incoherence among frequencies, despite having shorter delays.
-I left the possibility to choose the minimum-phase feature by configuration.
+I left the possibility to choose the minimum-phase feature by configuring the
+`YM7128B_USE_MINPHASE` preprocessor symbol.
+
+### Floating-point
+
+It is possible to configure the floating point data type used for processing,
+via the `YM7128B_FLOAT` preprocessor symbol. It defaults to `double`
+(*double precision*).
+
+Please note that, contrary to common beliefs, the `double` data type is
+actually very fast on machines with hardware support for it.
+
+I think that you should switch to `float` (*single precision*) only if:
+
+- the hardware is limited to it, or
+- if machine code vectorization gets faster, or
+- conversion from/to buffer data to/from double precision is slower.
 
 _______________________________________________________________________________
 

@@ -48,8 +48,8 @@ extern "C" {
 #define YM7128B_Float_Max   (+1)    //!< Minimum floating point value
 #endif
 
-#ifndef YM7128B_MINPHASE
-#define YM7128B_MINPHASE 0          //!< Enables minimum-phase oversampler kernel
+#ifndef YM7128B_USE_MINPHASE
+#define YM7128B_USE_MINPHASE 0          //!< Enables minimum-phase oversampler kernel
 #endif
 
 // ============================================================================

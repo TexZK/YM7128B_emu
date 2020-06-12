@@ -369,7 +369,7 @@ YM7128B_Tap const YM7128B_Tap_Table[YM7128B_Tap_Value_Count] =
 
 YM7128B_Fixed const YM7128B_OversamplerFixed_Kernel[YM7128B_Oversampler_Length] =
 {
-#if YM7128B_MINPHASE
+#if YM7128B_USE_MINPHASE
     // minimum phase
     KERNEL(+0.073585247514714749),
     KERNEL(+0.269340051166713890),
@@ -448,7 +448,7 @@ YM7128B_Fixed YM7128B_OversamplerFixed_Process(
 
 YM7128B_Float const YM7128B_OversamplerFloat_Kernel[YM7128B_Oversampler_Length] =
 {
-#if YM7128B_MINPHASE
+#if YM7128B_USE_MINPHASE
     // minimum phase
     KERNEL(+0.073585247514714749),
     KERNEL(+0.269340051166713890),

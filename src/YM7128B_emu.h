@@ -54,7 +54,7 @@ extern "C" {
 
 // ============================================================================
 
-#define YM7128B_VERSION "0.1.0"
+#define YM7128B_VERSION "0.1.1"
 
 char const* YM7128B_GetVersion(void);
 

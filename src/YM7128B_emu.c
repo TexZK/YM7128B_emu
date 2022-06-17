@@ -816,9 +816,12 @@ void YM7128B_ChipFloat_Write(
 
 void YM7128B_ChipIdeal_Ctor(YM7128B_ChipIdeal* self)
 {
+    assert(self);
     self->buffer_ = NULL;
     self->length_ = 0;
     self->sample_rate_ = 0;
+
+    YM7128B_ChipIdeal_Reset(self);
 }
 
 // ----------------------------------------------------------------------------
@@ -828,15 +831,33 @@ void YM7128B_ChipIdeal_Dtor(YM7128B_ChipIdeal* self)
     if (self->buffer_) {
         free(self->buffer_);
         self->buffer_ = NULL;
+        self->length_ = 0;
     }
 }
 
 // ----------------------------------------------------------------------------
-
 void YM7128B_ChipIdeal_Reset(YM7128B_ChipIdeal* self)
 {
-    for (YM7128B_Address i = 0; i <= YM7128B_Address_Max; ++i) {
+    assert(self);
+
+    for (int i = 0; i < YM7128B_Reg_Count; ++i)
         self->regs_[i] = 0;
+
+    for (int i = 0; i < YM7128B_Reg_T0; ++i)
+        self->gains_[i] = 0.0f;
+
+    // self->taps_[] are populated by YM7128B_ChipIdeal_Setup()
+    self->t0_d_ = 0.0f;
+    self->tail_ = 0;
+
+    // Only zero the buffer if we have one
+    if(self->buffer_ && self->length_) {
+        for (int i = 0; i < self->length_; ++i) {
+            self->buffer_[i] = 0.0f;
+        }
+
+        // if we have a buffer, then sample rate must be set
+        assert(self->sample_rate_ > 0);
     }
 }
 
@@ -956,12 +977,13 @@ void YM7128B_ChipIdeal_Write(
 }
 
 // ----------------------------------------------------------------------------
-
 void YM7128B_ChipIdeal_Setup(
     YM7128B_ChipIdeal* self,
     YM7128B_TapIdeal sample_rate
 )
 {
+    assert(self);
+
     if (self->sample_rate_ != sample_rate) {
         self->sample_rate_ = sample_rate;
 

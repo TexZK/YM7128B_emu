@@ -28,6 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "YM7128B_emu.h"
 
+#include <assert.h>
+
 // ============================================================================
 
 char const* YM7128B_GetVersion(void)
@@ -660,7 +662,7 @@ void YM7128B_ChipFixed_Write(
 
 void YM7128B_ChipFloat_Ctor(YM7128B_ChipFloat* self)
 {
-    (void)self;
+    YM7128B_ChipFloat_Reset(self);
 }
 
 // ----------------------------------------------------------------------------
@@ -674,9 +676,22 @@ void YM7128B_ChipFloat_Dtor(YM7128B_ChipFloat* self)
 
 void YM7128B_ChipFloat_Reset(YM7128B_ChipFloat* self)
 {
-    for (YM7128B_Address i = 0; i <= YM7128B_Address_Max; ++i) {
+    assert(self);
+
+    for (int i = 0; i < YM7128B_Reg_Count; ++i)
         self->regs_[i] = 0;
-    }
+
+    for (int i = 0; i < YM7128B_Reg_T0; ++i)
+        self->gains_[i] = 0.0f;
+
+    self->t0_d_ = 0.0f;
+    self->tail_ = 0;
+
+    for (int i = 0; i < YM7128B_Buffer_Length; ++i)
+        self->buffer_[i] = 0.0f;
+
+    for (int i = 0; i < YM7128B_OutputChannel_Count; ++i)
+        YM7128B_OversamplerFloat_Clear(&self->oversampler_[i], 0.0f);
 }
 
 // ----------------------------------------------------------------------------

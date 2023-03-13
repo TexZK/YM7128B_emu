@@ -136,6 +136,9 @@ enum YM7128B_DatasheetSpecs {
     //! Output sample rate
     YM7128B_Output_Rate       = YM7128B_Input_Rate * YM7128B_Oversampling,
 
+    //! Minimum register address
+    YM7128B_Address_Min       = 0,
+
     //! Maximum register address
     YM7128B_Address_Max       = YM7128B_Reg_Count - 1,
 

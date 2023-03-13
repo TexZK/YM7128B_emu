@@ -541,7 +541,7 @@ void YM7128B_ChipFixed_Reset(YM7128B_ChipFixed* self)
 {
     assert(self);
 
-    for (YM7128B_Address i = 0; i <= YM7128B_Address_Max; ++i) {
+    for (YM7128B_Address i = YM7128B_Address_Min; i <= YM7128B_Address_Max; ++i) {
         YM7128B_ChipFixed_Write(self, i, 0x00);
     }
 }
@@ -693,7 +693,7 @@ void YM7128B_ChipFloat_Reset(YM7128B_ChipFloat* self)
 {
     assert(self);
 
-    for (YM7128B_Address i = 0; i < YM7128B_Reg_Count; ++i) {
+    for (YM7128B_Address i = YM7128B_Address_Min; i <= YM7128B_Address_Max; ++i) {
         YM7128B_ChipFloat_Write(self, i, 0x00);
     }
 }
@@ -854,7 +854,7 @@ void YM7128B_ChipIdeal_Reset(YM7128B_ChipIdeal* self)
 {
     assert(self);
 
-    for (YM7128B_Address i = 0; i < YM7128B_Reg_Count; ++i) {
+    for (YM7128B_Address i = YM7128B_Address_Min; i <= YM7128B_Address_Max; ++i) {
         YM7128B_ChipIdeal_Write(self, i, 0x00);
     }
 }
@@ -1044,7 +1044,7 @@ void YM7128B_ChipShort_Reset(YM7128B_ChipShort* self)
 {
     assert(self);
 
-    for (YM7128B_Address i = 0; i <= YM7128B_Address_Max; ++i) {
+    for (YM7128B_Address i = YM7128B_Address_Min; i <= YM7128B_Address_Max; ++i) {
         YM7128B_ChipShort_Write(self, i, 0x00);
     }
 }

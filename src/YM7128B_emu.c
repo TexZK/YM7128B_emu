@@ -1,7 +1,7 @@
 /*
 BSD 2-Clause License
 
-Copyright (c) 2020, Andrea Zoppi
+Copyright (c) 2020-2023, Andrea Zoppi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -693,7 +693,7 @@ void YM7128B_ChipFloat_Reset(YM7128B_ChipFloat* self)
 {
     assert(self);
 
-    for (int i = 0; i < YM7128B_Reg_Count; ++i) {
+    for (YM7128B_Address i = 0; i < YM7128B_Reg_Count; ++i) {
         YM7128B_ChipFloat_Write(self, i, 0x00);
     }
 }
@@ -854,7 +854,7 @@ void YM7128B_ChipIdeal_Reset(YM7128B_ChipIdeal* self)
 {
     assert(self);
 
-    for (int i = 0; i < YM7128B_Reg_Count; ++i) {
+    for (YM7128B_Address i = 0; i < YM7128B_Reg_Count; ++i) {
         YM7128B_ChipIdeal_Write(self, i, 0x00);
     }
 }
@@ -892,7 +892,7 @@ void YM7128B_ChipIdeal_Process(
 {
     assert(self);
     assert(data);
-    
+
     if ((self->buffer_ == NULL) || (self->length_ == 0)) {
         return;
     }

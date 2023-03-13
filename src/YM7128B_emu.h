@@ -1,7 +1,7 @@
 /*
 BSD 2-Clause License
 
-Copyright (c) 2020, Andrea Zoppi
+Copyright (c) 2020-2023, Andrea Zoppi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

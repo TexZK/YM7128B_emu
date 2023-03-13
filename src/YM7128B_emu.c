@@ -1003,8 +1003,7 @@ void YM7128B_ChipIdeal_Setup(
             self->length_ = (sample_rate / 10) + 1;
             self->buffer_ = (YM7128B_Float*)calloc(self->length_, sizeof(YM7128B_Float));
 
-            for (YM7128B_Address i = 0; i < YM7128B_Tap_Count; ++i)
-            {
+            for (YM7128B_Address i = 0; i < YM7128B_Tap_Count; ++i) {
                 YM7128B_Register data = self->regs_[i + YM7128B_Reg_T0];
                 self->taps_[i] = YM7128B_RegisterToTapIdeal(data, self->sample_rate_);
             }
@@ -1197,8 +1196,7 @@ void YM7128B_ChipShort_Setup(
             self->length_ = (sample_rate / 10) + 1;
             self->buffer_ = (YM7128B_Fixed*)calloc(self->length_, sizeof(YM7128B_Fixed));
 
-            for (YM7128B_Address i = 0; i < YM7128B_Tap_Count; ++i)
-            {
+            for (YM7128B_Address i = 0; i < YM7128B_Tap_Count; ++i) {
                 YM7128B_Register data = self->regs_[i + YM7128B_Reg_T0];
                 self->taps_[i] = YM7128B_RegisterToTapIdeal(data, self->sample_rate_);
             }

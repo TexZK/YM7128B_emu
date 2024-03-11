@@ -428,12 +428,12 @@ YM7128B_Fixed YM7128B_OversamplerFixed_Process(
     YM7128B_Accumulator accum = 0;
 
     for (YM7128B_Oversampler_Index i = 0; i < YM7128B_Oversampler_Length; ++i) {
+        YM7128B_Fixed kernel = YM7128B_OversamplerFixed_Kernel[i];
+        YM7128B_Fixed oversampled = YM7128B_MulFixed(input, kernel);
+        accum += oversampled;
         YM7128B_Fixed sample = self->buffer_[i];
         self->buffer_[i] = input;
         input = sample;
-        YM7128B_Fixed kernel = YM7128B_OversamplerFixed_Kernel[i];
-        YM7128B_Fixed oversampled = YM7128B_MulFixed(sample, kernel);
-        accum += oversampled;
     }
 
     YM7128B_Fixed clamped = YM7128B_ClampFixed(accum);
@@ -509,12 +509,12 @@ YM7128B_Float YM7128B_OversamplerFloat_Process(
     YM7128B_Float accum = 0;
 
     for (YM7128B_Oversampler_Index i = 0; i < YM7128B_Oversampler_Length; ++i) {
+        YM7128B_Float kernel = YM7128B_OversamplerFloat_Kernel[i];
+        YM7128B_Float oversampled = YM7128B_MulFloat(input, kernel);
+        accum += oversampled;
         YM7128B_Float sample = self->buffer_[i];
         self->buffer_[i] = input;
         input = sample;
-        YM7128B_Float kernel = YM7128B_OversamplerFloat_Kernel[i];
-        YM7128B_Float oversampled = YM7128B_MulFloat(sample, kernel);
-        accum += oversampled;
     }
 
     YM7128B_Float output = YM7128B_ClampFloat(accum);
@@ -525,6 +525,7 @@ YM7128B_Float YM7128B_OversamplerFloat_Process(
 
 void YM7128B_ChipFixed_Ctor(YM7128B_ChipFixed* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -532,6 +533,7 @@ void YM7128B_ChipFixed_Ctor(YM7128B_ChipFixed* self)
 
 void YM7128B_ChipFixed_Dtor(YM7128B_ChipFixed* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -569,6 +571,7 @@ void YM7128B_ChipFixed_Start(YM7128B_ChipFixed* self)
 
 void YM7128B_ChipFixed_Stop(YM7128B_ChipFixed* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -677,6 +680,7 @@ void YM7128B_ChipFixed_Write(
 
 void YM7128B_ChipFloat_Ctor(YM7128B_ChipFloat* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -684,6 +688,7 @@ void YM7128B_ChipFloat_Ctor(YM7128B_ChipFloat* self)
 
 void YM7128B_ChipFloat_Dtor(YM7128B_ChipFloat* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -721,6 +726,7 @@ void YM7128B_ChipFloat_Start(YM7128B_ChipFloat* self)
 
 void YM7128B_ChipFloat_Stop(YM7128B_ChipFloat* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -880,6 +886,7 @@ void YM7128B_ChipIdeal_Start(YM7128B_ChipIdeal* self)
 
 void YM7128B_ChipIdeal_Stop(YM7128B_ChipIdeal* self)
 {
+    (void)self;
     assert(self);
 }
 
@@ -1070,6 +1077,7 @@ void YM7128B_ChipShort_Start(YM7128B_ChipShort* self)
 
 void YM7128B_ChipShort_Stop(YM7128B_ChipShort* self)
 {
+    (void)self;
     assert(self);
 }
 

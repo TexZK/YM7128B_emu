@@ -55,7 +55,7 @@ extern "C" {
 
 // ============================================================================
 
-#define YM7128B_VERSION "0.1.2"
+#define YM7128B_VERSION "0.1.3"
 
 char const* YM7128B_GetVersion(void);
 
@@ -177,7 +177,6 @@ enum YM7128B_ImplementationSpecs {
     YM7128B_Fixed_Bits          = sizeof(YM7128B_Fixed) * CHAR_BIT,
     YM7128B_Fixed_Mask          = (1 << YM7128B_Fixed_Bits) - 1,
     YM7128B_Fixed_Decimals      = YM7128B_Fixed_Bits - 1,
-    YM7128B_Fixed_Rounding      = 1 << (YM7128B_Fixed_Decimals - 1),
     YM7128B_Fixed_Max           = (1 << YM7128B_Fixed_Decimals) - 1,
     YM7128B_Fixed_Min           = -YM7128B_Fixed_Max,
 
@@ -201,7 +200,7 @@ enum YM7128B_ImplementationSpecs {
     YM7128B_Gain_Clear_Mask     = (1 << YM7128B_Gain_Clear_Bits) - 1,
     YM7128B_Gain_Mask           = YM7128B_Fixed_Mask - YM7128B_Gain_Clear_Mask,
     YM7128B_Gain_Decimals       = YM7128B_Gain_Bits - 1,
-    YM7128B_Gain_Max            = (1 << (YM7128B_Fixed_Bits - 1)) - 1,
+    YM7128B_Gain_Max            = ((1 << (YM7128B_Fixed_Bits - 1)) - 1),
     YM7128B_Gain_Min            = -YM7128B_Gain_Max,
 
     // Feedback coefficient multiplication operand specs
@@ -405,7 +404,7 @@ YM7128B_Fixed YM7128B_MulFixed(YM7128B_Fixed a, YM7128B_Fixed b)
     YM7128B_Accumulator aa = a & (YM7128B_Fixed)YM7128B_Operand_Mask;
     YM7128B_Accumulator bb = b & (YM7128B_Fixed)YM7128B_Operand_Mask;
     YM7128B_Accumulator mm = aa * bb;
-    YM7128B_Fixed x = (YM7128B_Fixed)(mm >> YM7128B_Fixed_Decimals);
+    YM7128B_Fixed x = (YM7128B_Fixed)(((mm >> (YM7128B_Fixed_Decimals - 1)) + 1) >> 1);
     YM7128B_Fixed y = x & (YM7128B_Fixed)YM7128B_Operand_Mask;
     return y;
 }
@@ -427,7 +426,8 @@ YM7128B_Fixed YM7128B_MulShort(YM7128B_Fixed a, YM7128B_Fixed b)
     YM7128B_Accumulator aa = a;
     YM7128B_Accumulator bb = b;
     YM7128B_Accumulator mm = aa * bb;
-    YM7128B_Fixed y = (YM7128B_Fixed)(mm >> YM7128B_Fixed_Decimals);
+    YM7128B_Fixed x = (YM7128B_Fixed)((((mm >> YM7128B_Fixed_Decimals) - 1) + 1) >> 1);
+    YM7128B_Fixed y = x;
     return y;
 }
 
